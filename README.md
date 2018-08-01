@@ -1,0 +1,1 @@
+# shoppingregistry-android
