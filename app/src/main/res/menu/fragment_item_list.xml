@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <item android:title="@string/menu_fragment_item_list_title"
+        android:id="@+id/menu_item_new_shopping_item"
+        app:showAsAction="ifRoom|withText"/>
+</menu>
