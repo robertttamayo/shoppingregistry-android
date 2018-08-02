@@ -9,4 +9,5 @@
     <string name="menu_fragment_item_list_title">Add New Item</string>
     <string name="title_activity_shopping_item_pager">ShoppingItemPagerActivity</string>
     <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity_loading">LoadingActivity</string>
 </resources>

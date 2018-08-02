@@ -15,12 +15,16 @@ public class ShoppingListManager {
     private ShoppingListManager() {
         mShoppingItems = new ArrayList<>();
         // TODO: Fetch items from database for user's account
+
     }
     public static ShoppingListManager get(Context context) {
         if (mShoppingListManager == null) {
             mShoppingListManager = new ShoppingListManager();
         }
         return mShoppingListManager;
+    }
+    public static void initialize(Context context, List<ShoppingItem> shoppingItems) {
+        get(context).setShoppingItems(shoppingItems);
     }
     public ShoppingItem getShoppingItem(UUID id) {
         for (ShoppingItem item: mShoppingItems) {
@@ -32,6 +36,10 @@ public class ShoppingListManager {
     }
     public List<ShoppingItem> getShoppingItems() {
         return mShoppingItems;
+    }
+
+    private void setShoppingItems(List<ShoppingItem> shoppingItems) {
+        mShoppingItems = shoppingItems;
     }
 
     public void addShoppingItem(ShoppingItem shoppingItem) {
