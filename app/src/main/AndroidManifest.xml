@@ -15,7 +15,11 @@
         <activity
             android:name=".ShoppingItemPagerActivity"
             android:label="@string/title_activity_shopping_item_pager"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:parentActivityName=".ListActivity"/>
+        <activity
+            android:name=".ShoppingItemCreateActivity"
+            android:label="@string/title_activity_shopping_item_pager"
+            android:parentActivityName=".ListActivity"/>
         <activity
             android:name=".LoadingActivity"
             android:label="@string/title_activity_loading"

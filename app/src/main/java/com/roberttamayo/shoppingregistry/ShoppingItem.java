@@ -10,6 +10,10 @@ public class ShoppingItem {
     private boolean mIsPurchased;
     private UUID mId;
 
+    private int userId;
+    private int accountId;
+    private int dbId;
+
     public ShoppingItem() {
         this(UUID.randomUUID());
     }
@@ -47,6 +51,30 @@ public class ShoppingItem {
 
     public void setPurchased(boolean purchased) {
         mIsPurchased = purchased;
+    }
+
+    public int getDbId() {
+        return dbId;
+    }
+
+    public void setDbId(int dbId) {
+        this.dbId = dbId;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public int getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(int accountId) {
+        this.accountId = accountId;
     }
 
 }

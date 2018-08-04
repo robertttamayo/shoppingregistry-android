@@ -1,18 +1,42 @@
 package com.roberttamayo.shoppingregistry;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.util.Pair;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -64,18 +88,23 @@ public class ShoppingItemDetailFragment extends Fragment {
 
             }
         });
-
-        CheckBox checkBox = (CheckBox) v.findViewById(R.id.item_is_purchased);
-        checkBox.setChecked(mShoppingItem.isPurchased());
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        editText.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                mShoppingItem.setPurchased(b);
-                // TODO: Logic to remove this item from the list
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == EditorInfo.IME_ACTION_DONE) {
+                    InputMethodManager manager = (InputMethodManager) textView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    manager.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+                    // TODO: Write new item to remote database with AsyncTask
+
+                    return true;
+                }
+                return false;
             }
         });
 
         return v;
     }
+
+
 
 }

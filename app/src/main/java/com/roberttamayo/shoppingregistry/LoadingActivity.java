@@ -12,6 +12,8 @@ import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
 
+import com.roberttamayo.shoppingregistry.helpers.WeNeed;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -68,7 +70,7 @@ public class LoadingActivity extends AppCompatActivity {
                 List<Pair<String, String>> params = new ArrayList<>();
                 params.add(new Pair<>("account_id", "1"));
                 params.add(new Pair<>("action", "get_items"));
-                String postQuery = getPostQueryString((ArrayList<Pair<String, String>>) params);
+                String postQuery = WeNeed.getPostQueryString((ArrayList<Pair<String, String>>) params);
 
                 OutputStream outputStream = client.getOutputStream();
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
@@ -115,25 +117,6 @@ public class LoadingActivity extends AppCompatActivity {
 
             Intent intent = new Intent(getApplicationContext(), ListActivity.class);
             startActivity(intent);
-        }
-
-        private String getPostQueryString(ArrayList<Pair<String, String>> params) throws UnsupportedEncodingException {
-            StringBuilder builder = new StringBuilder();
-
-            boolean isFirst = true;
-            for (Pair<String, String> pair : params) {
-                if (isFirst) {
-                    isFirst = false;
-                } else {
-                    builder.append('&');
-                }
-                builder.append(URLEncoder.encode(pair.first, "UTF-8"))
-                        .append('=')
-                        .append(URLEncoder.encode(pair.second, "UTF-8"));
-            }
-
-            String queryString = builder.toString();
-            return queryString;
         }
     }
 }

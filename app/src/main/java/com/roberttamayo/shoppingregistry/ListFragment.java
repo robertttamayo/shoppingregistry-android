@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import java.util.GregorianCalendar;
 import java.util.List;
 
 public class ListFragment extends Fragment {
@@ -54,11 +56,9 @@ public class ListFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.menu_item_new_shopping_item:
-                // create new Shopping Item first
-                ShoppingItem shoppingItem = new ShoppingItem();
-                ShoppingListManager.get(getActivity()).addShoppingItem(shoppingItem);
                 // start a new activity to add details
-                Intent intent = ShoppingItemPagerActivity.newIntent(getActivity(), shoppingItem.getId());
+//                Intent intent = ShoppingItemPagerActivity.newIntent(getActivity(), shoppingItem.getId());
+                Intent intent = new Intent(getActivity(), ShoppingItemCreateActivity.class);
                 startActivity(intent);
                 return true;
             default:
@@ -97,8 +97,11 @@ public class ListFragment extends Fragment {
 
         public void bindCrime(ShoppingItem shoppingItem) {
             mShoppingItem = shoppingItem;
+
+            DateFormat df = new DateFormat();
+            CharSequence formattedDate = df.format("MMM d", shoppingItem.getDate());
             mTitleTextView.setText(mShoppingItem.getTitle());
-            mDateTextView.setText(mShoppingItem.getDate().toString());
+            mDateTextView.setText("Added " + formattedDate);
             mPurchasedCheckBox.setChecked(mShoppingItem.isPurchased());
         }
 

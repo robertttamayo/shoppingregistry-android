@@ -14,7 +14,6 @@ public class ShoppingListManager {
 
     private ShoppingListManager() {
         mShoppingItems = new ArrayList<>();
-        // TODO: Fetch items from database for user's account
 
     }
     public static ShoppingListManager get(Context context) {
