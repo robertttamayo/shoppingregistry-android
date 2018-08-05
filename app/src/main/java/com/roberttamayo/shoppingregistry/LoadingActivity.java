@@ -26,6 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -96,7 +97,9 @@ public class LoadingActivity extends AppCompatActivity {
                     ShoppingItem shoppingItem = new ShoppingItem();
                     shoppingItem.setTitle(item.getString("item_name"));
                     shoppingItem.setPurchased(item.getInt("item_is_purchased") == 0 ? false : true);
-                    shoppingItem.setDate(new Date());
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    shoppingItem.setDate(sdf.parse(item.getString("item_date_added")));
+                    shoppingItem.setDbId(item.getInt("item_id"));
                     shoppingItems.add(shoppingItem);
                 }
 
