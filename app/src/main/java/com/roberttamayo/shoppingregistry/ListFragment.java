@@ -146,7 +146,12 @@ public class ListFragment extends Fragment {
         private List<ShoppingItem> mShoppingItems;
 
         public ShoppingItemAdapter(List<ShoppingItem> shoppingItems) {
-            mShoppingItems = shoppingItems;
+            mShoppingItems = new ArrayList<>();
+            for (ShoppingItem shoppingItem : shoppingItems) {
+                if (!shoppingItem.isPurchased()) {
+                    mShoppingItems.add(shoppingItem);
+                }
+            }
         }
 
         @Override

@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.roberttamayo.shoppingregistry.helpers.WeNeed;
 
@@ -33,11 +34,15 @@ import java.util.List;
 
 public class LoadingActivity extends AppCompatActivity {
     private final String TAG = "LogLoading";
+    private ProgressBar mSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading);
+
+        mSpinner = (ProgressBar) findViewById(R.id.loading_spinner);
+        mSpinner.setVisibility(View.VISIBLE);
 
         new ShoppingItemFetcher().execute();
 

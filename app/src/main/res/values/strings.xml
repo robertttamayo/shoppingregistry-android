@@ -12,4 +12,5 @@
     <string name="item_submit">Done</string>
     <string name="done_adding_items">All set!</string>
     <string name="item_add_another">...And Also...</string>
+    <string name="added_so_far">Added so far:</string>
 </resources>

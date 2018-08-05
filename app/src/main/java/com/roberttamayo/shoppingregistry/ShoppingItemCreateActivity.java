@@ -1,5 +1,6 @@
 package com.roberttamayo.shoppingregistry;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,8 +11,13 @@ import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,16 +44,28 @@ public class ShoppingItemCreateActivity extends AppCompatActivity {
     // user can either create a new ShoppingItem or return to the ListActivity when done
 
     private final String TAG = "WeNeedCreateActivity";
-
+    private ProgressBar mProgressBar;
     private String mItemName;
+    private EditText mEditTitle;
+    private TextView mTitleAdded;
+    private TextView mRecentlyAddedList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shopping_item_create);
 
+        mTitleAdded = findViewById(R.id.title_added_so_far);
+        mTitleAdded.setVisibility(View.GONE);
+
+        mRecentlyAddedList = (TextView) findViewById(R.id.recently_added_list);
+
+        mProgressBar = (ProgressBar) findViewById(R.id.loading_spinner);
+        mProgressBar.setVisibility(View.GONE);
+
         String itemName;
-        EditText title = (EditText) findViewById(R.id.item_title);
-        title.addTextChangedListener(new TextWatcher() {
+        mEditTitle = (EditText) findViewById(R.id.item_title);
+        mEditTitle.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -63,13 +81,19 @@ public class ShoppingItemCreateActivity extends AppCompatActivity {
 
             }
         });
-        title.setOnEditorActionListener(new EditText.OnEditorActionListener(){
+        mEditTitle.setOnEditorActionListener(new EditText.OnEditorActionListener(){
 
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 if (i == EditorInfo.IME_ACTION_DONE) {
                     int userId = WeNeed.USER_ID;
                     int accountId = WeNeed.ACCOUNT_ID;
+
+                    InputMethodManager imm = (InputMethodManager) textView.getContext()
+                            .getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
+
+                    mProgressBar.setVisibility(View.VISIBLE);
 
                     new ShoppingItemCreateActivity.ShoppingItemPusher(mItemName).execute();
 
@@ -149,6 +173,19 @@ public class ShoppingItemCreateActivity extends AppCompatActivity {
         protected void onPostExecute(ShoppingItem item) {
             super.onPostExecute(item);
             ShoppingListManager.get(getApplicationContext()).addShoppingItem(item);
+
+            mProgressBar.setVisibility(View.GONE);
+            mEditTitle.clearFocus();
+            mEditTitle.setText("");
+
+            mTitleAdded.setVisibility(View.VISIBLE);
+
+            String currentText = (String) mRecentlyAddedList.getText();
+            if (currentText.length() != 0) {
+                currentText += "\n";
+            }
+            mRecentlyAddedList.setText(currentText + item.getTitle());
+
             Toast.makeText(getApplicationContext()
                     , "Success! Added " + item.getTitle() + " to your list."
                     , Toast.LENGTH_SHORT)
