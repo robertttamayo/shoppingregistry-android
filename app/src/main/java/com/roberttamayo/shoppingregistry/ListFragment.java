@@ -16,11 +16,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.roberttamayo.shoppingregistry.helpers.AsyncTaskExecutable;
+import com.roberttamayo.shoppingregistry.helpers.ShoppingItemDeleter;
+import com.roberttamayo.shoppingregistry.helpers.ShoppingItemFetcher;
 import com.roberttamayo.shoppingregistry.helpers.WeNeed;
 
 import org.json.JSONArray;
@@ -33,16 +38,20 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-public class ListFragment extends Fragment {
+public class ListFragment extends Fragment implements AsyncTaskExecutable<List<ShoppingItem>> {
 
     private final String TAG = "LogListFragment";
     private RecyclerView mItemRecyclerView;
     private ShoppingItemAdapter mAdapter;
+    private Button mRefreshButton;
+    private ShoppingItemFetcher mFetcher;
+    private ProgressBar mLoader;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,16 +60,32 @@ public class ListFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View view = inflater.inflate(R.layout.fragment_item_list, container, false);
+
+        mLoader = (ProgressBar) view.findViewById(R.id.loading_spinner);
+        mLoader.setVisibility(View.GONE);
 
         mItemRecyclerView = (RecyclerView) view.findViewById(R.id.item_recycler_view);
         mItemRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-//        if (savedInstanceState != null) {
-//            mSubtitleVisible = savedInstanceState.getBoolean(SAVED_SUBTITLE_VISIBLE, false);
-//        }
-//
+        mRefreshButton = (Button) view.findViewById(R.id.refresh_button);
+        final AsyncTaskExecutable<List<ShoppingItem>> mCaller = this;
+        mRefreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mLoader.setVisibility(View.VISIBLE);
+                mFetcher = new ShoppingItemFetcher(mCaller);
+                mFetcher.execute();
+            }
+        });
+
         refreshUI();
 
         return view;
@@ -97,13 +122,24 @@ public class ListFragment extends Fragment {
         }
     }
 
-    private class ShoppingItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    @Override
+    public void onFinish(List<ShoppingItem> shoppingItems) {
+        mLoader.setVisibility(View.GONE);
+        ShoppingListManager.initialize(getActivity(), shoppingItems);
+        mAdapter.updateShoppingItems(shoppingItems);
+        refreshUI();
+    }
+
+    private class ShoppingItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener, AsyncTaskExecutable<ShoppingItem> {
 
         private ShoppingItem mShoppingItem;
+        private ShoppingItemDeleter mAsyncDeleter;
 
         private TextView mTitleTextView;
         private TextView mDateTextView;
         private CheckBox mPurchasedCheckBox;
+        private ProgressBar mUpdatePending;
+        private TextView mUpdatedTextView;
 
         public ShoppingItemHolder(View itemView) {
             super(itemView);
@@ -112,13 +148,20 @@ public class ListFragment extends Fragment {
             mTitleTextView = (TextView) itemView.findViewById(R.id.list_item_title_text_view);
             mDateTextView = (TextView) itemView.findViewById(R.id.list_item_date_text_view);
             mPurchasedCheckBox = (CheckBox) itemView.findViewById(R.id.list_item_is_purchased_check_box);
+            mUpdatePending = (ProgressBar) itemView.findViewById(R.id.list_item_update_pending);
+            mUpdatedTextView = (TextView) itemView.findViewById(R.id.list_item_updated_text);
+
+            mUpdatePending.setVisibility(View.GONE);
+            mUpdatedTextView.setVisibility(View.GONE);
 
             mPurchasedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     mShoppingItem.setPurchased(b);
+                    mUpdatedTextView.setVisibility(View.GONE);
                     if (b) {
-                        new ListFragment.ShoppingItemDeleter(mShoppingItem).execute();
+                        mUpdatePending.setVisibility(View.VISIBLE);
+                        mAsyncDeleter.execute();
                     }
                 }
             });
@@ -126,6 +169,8 @@ public class ListFragment extends Fragment {
 
         public void bindItem(ShoppingItem shoppingItem) {
             mShoppingItem = shoppingItem;
+
+            mAsyncDeleter = new ShoppingItemDeleter(this, mShoppingItem);
 
             DateFormat df = new DateFormat();
             CharSequence formattedDate = df.format("MMM d", shoppingItem.getDate());
@@ -139,6 +184,18 @@ public class ListFragment extends Fragment {
             Intent intent = ShoppingItemPagerActivity.newIntent(getActivity(), mShoppingItem.getId());
             startActivity(intent);
         }
+
+        @Override
+        public void onFinish(ShoppingItem item) {
+            mShoppingItem = item;
+            mAsyncDeleter = new ShoppingItemDeleter(this, mShoppingItem);
+            mUpdatePending.setVisibility(View.GONE);
+            mUpdatedTextView.setVisibility(View.VISIBLE);
+            Toast.makeText(getContext()
+                    , "Success!" + item.isPurchased()
+                    , Toast.LENGTH_SHORT)
+                    .show();
+        }
     }
 
     private class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemHolder> {
@@ -150,6 +207,14 @@ public class ListFragment extends Fragment {
             for (ShoppingItem shoppingItem : shoppingItems) {
                 if (!shoppingItem.isPurchased()) {
                     mShoppingItems.add(shoppingItem);
+                }
+            }
+        }
+        public void updateShoppingItems(List<ShoppingItem> shoppingItems) {
+            mShoppingItems.clear();
+            for(ShoppingItem item : shoppingItems) {
+                if (!item.isPurchased()) {
+                    mShoppingItems.add(item);
                 }
             }
         }
@@ -173,81 +238,6 @@ public class ListFragment extends Fragment {
         }
     }
 
-    private class ShoppingItemDeleter extends AsyncTask<Void, Void, ShoppingItem> {
-        ShoppingItem mItem;
 
-        public ShoppingItemDeleter(ShoppingItem item) {
-            mItem = item;
-            Log.d(TAG, "item id: " + item.getDbId());
-        }
 
-        @Override
-        protected ShoppingItem doInBackground(Void... voids) {
-            ShoppingItem shoppingItem = mItem;
-            String data = "";
-            try {
-                URL url = new URL(WeNeed.API.URL);
-                HttpURLConnection client = (HttpURLConnection) url.openConnection();
-                client.setRequestMethod("POST");
-                client.setDoInput(true);
-                client.setDoOutput(true);
-
-                String accountId = Integer.toString(WeNeed.ACCOUNT_ID);
-                String userId = Integer.toString(WeNeed.USER_ID);
-
-                Log.d(TAG, "Shopping item item_id: " + shoppingItem.getDbId());
-                List<Pair<String, String>> params = new ArrayList<>();
-                params.add(new Pair<>("action", "modify_item"));
-                params.add(new Pair<>("item_id", Integer.toString(shoppingItem.getDbId())));
-                params.add(new Pair<>("item_is_purchased", shoppingItem.isPurchased() ? "1" : "0"));
-                String postQuery = WeNeed.getPostQueryString((ArrayList<Pair<String, String>>) params);
-
-                OutputStream outputStream = client.getOutputStream();
-                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
-                BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
-
-                bufferedWriter.write(postQuery);
-                bufferedWriter.flush();
-                bufferedWriter.close();
-                outputStreamWriter.close();
-
-                int responseCode = client.getResponseCode();
-
-                if (responseCode == 200) {
-                    String line;
-                    BufferedReader br = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                    while ((line = br.readLine()) != null) {
-                        data += line;
-                    }
-                    Log.d(TAG, "data: " + data);
-
-                    JSONArray jsonArray = new JSONArray(data);
-
-                    JSONObject jsonObject = new JSONObject(jsonArray.getString(0));
-
-                    shoppingItem.setDate(new Date());
-                    shoppingItem.setTitle(jsonObject.getString(WeNeed.DB.Cols.ITEM_NAME));
-                    shoppingItem.setDbId(jsonObject.getInt(WeNeed.DB.Cols.ITEM_ID));
-                    shoppingItem.setUserId(jsonObject.getInt(WeNeed.DB.Cols.ITEM_USER_ID));
-                    shoppingItem.setAccountId(jsonObject.getInt(WeNeed.DB.Cols.ITEM_ACCOUNT_ID));
-                    shoppingItem.setPurchased(jsonObject.getInt("item_is_purchased") == 1);
-
-                }
-
-            } catch (Exception e) {
-                Log.d(TAG, "error: " + e.getMessage());
-            } finally {
-
-            }
-            return shoppingItem;
-        }
-        @Override
-        protected void onPostExecute(ShoppingItem item) {
-            super.onPostExecute(item);
-            Toast.makeText(getContext()
-                    , "Success!" + item.isPurchased()
-                    , Toast.LENGTH_SHORT)
-                    .show();
-        }
-    }
 }

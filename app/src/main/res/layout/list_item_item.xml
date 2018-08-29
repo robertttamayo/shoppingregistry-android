@@ -23,6 +23,21 @@
         android:textStyle="bold"
         />
 
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/list_item_is_purchased_check_box"
+        android:id="@+id/list_item_update_pending"/>
+
+    <TextView
+        android:id="@+id/list_item_updated_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/list_item_updated_text"
+        android:padding="4dp"
+        android:layout_toLeftOf="@id/list_item_is_purchased_check_box"/>
+
+
     <TextView
         android:id="@+id/list_item_date_text_view"
         android:layout_width="match_parent"

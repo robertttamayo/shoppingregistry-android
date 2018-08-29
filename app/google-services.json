@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "353046147645",
+    "firebase_url": "https://we-need.firebaseio.com",
+    "project_id": "we-need",
+    "storage_bucket": "we-need.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:353046147645:android:4d9a6ca289c6dc1d",
+        "android_client_info": {
+          "package_name": "com.roberttamayo.shoppingregistry"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "353046147645-mo79c5hu90bd00k3cmbd4rj6g2qlao2g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.roberttamayo.shoppingregistry",
+            "certificate_hash": "e0083205b6ebff44484df227736a8f1b38d313e5"
+          }
+        },
+        {
+          "client_id": "353046147645-lpfisi7vg0e7k5so19tfgj2pf5ifv94d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsvGJ1s4Nx9LzrKlWkXqCRjhhDOVgJY2s"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "353046147645-lpfisi7vg0e7k5so19tfgj2pf5ifv94d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

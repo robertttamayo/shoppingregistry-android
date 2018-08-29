@@ -35,20 +35,14 @@ public class WeNeed {
 
     public static String getPostQueryString(ArrayList<Pair<String, String>> params) throws UnsupportedEncodingException {
         StringBuilder builder = new StringBuilder();
-
-        boolean isFirst = true;
-        for (Pair<String, String> pair : params) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
+        for (int i = 0; i < params.size(); i++) {
+            if (i != 0) {
                 builder.append('&');
             }
-            builder.append(URLEncoder.encode(pair.first, "UTF-8"))
+            builder.append(URLEncoder.encode(params.get(i).first, "UTF-8"))
                     .append('=')
-                    .append(URLEncoder.encode(pair.second, "UTF-8"));
+                    .append(URLEncoder.encode(params.get(i).second, "UTF-8"));
         }
-
-        String queryString = builder.toString();
-        return queryString;
+        return builder.toString();
     }
 }
