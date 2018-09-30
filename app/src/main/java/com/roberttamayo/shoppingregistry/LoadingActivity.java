@@ -1,6 +1,8 @@
 package com.roberttamayo.shoppingregistry;
 
+import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -16,6 +18,7 @@ import android.widget.ProgressBar;
 import com.roberttamayo.shoppingregistry.helpers.AsyncTaskExecutable;
 import com.roberttamayo.shoppingregistry.helpers.ShoppingItemFetcher;
 import com.roberttamayo.shoppingregistry.helpers.WeNeed;
+import com.roberttamayo.shoppingregistry.helpers.WeNeedDbHelper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,6 +41,14 @@ public class LoadingActivity extends AppCompatActivity implements AsyncTaskExecu
     private final String TAG = "LogLoading";
     private ProgressBar mProgressBar;
     private ShoppingItemFetcher mShoppingItemFetcher;
+    private Context mContext;
+    private SQLiteDatabase mDatabase;
+
+    public LoadingActivity(){
+        mContext = getApplicationContext();
+        mDatabase = new WeNeedDbHelper(mContext).getWritableDatabase();
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

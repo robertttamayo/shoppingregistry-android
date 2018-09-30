@@ -14,4 +14,20 @@
     <string name="item_add_another">...And Also...</string>
     <string name="added_so_far">Added so far:</string>
     <string name="list_item_updated_text">Purchased!</string>
+
+    <string name="login">Log In</string>
+    <string name="new_user">Don\'t have an username? Create one</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
+    <string name="email_hint">Email</string>
+
+    <string name="accountname_hint">Name of new group</string>
+    <string name="create_account">Create a new list</string>
+    <string name="done">Go</string>
+
+    <string name="invite_a_friend">Invite</string>
+    <string name="custom_message">Message</string>
+    <string name="custom_message_default">%s would like you to join their We Need group.</string>
+    <string name="send_invitation">Send</string>
+
 </resources>

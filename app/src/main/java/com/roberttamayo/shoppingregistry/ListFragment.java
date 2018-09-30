@@ -76,13 +76,11 @@ public class ListFragment extends Fragment implements AsyncTaskExecutable<List<S
         mItemRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         mRefreshButton = (Button) view.findViewById(R.id.refresh_button);
-        final AsyncTaskExecutable<List<ShoppingItem>> mCaller = this;
         mRefreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mLoader.setVisibility(View.VISIBLE);
-                mFetcher = new ShoppingItemFetcher(mCaller);
-                mFetcher.execute();
+                sync();
             }
         });
 
@@ -108,6 +106,11 @@ public class ListFragment extends Fragment implements AsyncTaskExecutable<List<S
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void sync() {
+        mFetcher = new ShoppingItemFetcher(this);
+        mFetcher.execute();
     }
 
     private void refreshUI() {
